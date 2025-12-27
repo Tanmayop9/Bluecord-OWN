@@ -116,6 +116,11 @@ public final class PreferenceKeys {
     public static final String ALERT_UPDATE_LAST_SHOWN_NOTIFICATION = "blue.update.notification.ts";
     public static final String ENABLE_OUTGOING_VOICE_MESSAGES = "blue.enable.outgoing.voice";
 
+    // Voice changer settings
+    public static final String VOICE_EFFECT_ENABLED = "blue.voice.effect.enabled";
+    public static final String VOICE_EFFECT_TYPE = "blue.voice.effect.type";
+    public static final String VOICE_EFFECT_PITCH = "blue.voice.effect.pitch";
+
     // Dead preference keys that should NOT be reused
 
     // public static final String DISCORD_THEME_KEY = "CACHE_KEY_THEME";
