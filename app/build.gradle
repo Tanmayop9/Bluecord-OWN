@@ -96,11 +96,9 @@ protobuf {
         artifact = 'com.google.protobuf:protoc:4.32.0'
     }
     generateProtoTasks {
-        all().each { task ->
-            task.builtins {
-                java {
-                    option 'lite'
-                }
+        all()*.builtins {
+            java {
+                option 'lite'
             }
         }
     }
