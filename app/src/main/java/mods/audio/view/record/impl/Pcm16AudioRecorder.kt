@@ -5,6 +5,8 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import mods.audio.converters.AudioConstants
+import mods.audio.effects.RealtimeVoiceProcessor
+import mods.audio.effects.VoiceEffectManager
 import mods.promise.runCatchingOrLog
 import mods.utils.LogUtils
 import mods.utils.ThreadUtils
@@ -74,6 +76,12 @@ class Pcm16AudioRecorder(
             ThreadUtils.startThread(TAG) {
                 runCatchingOrLog {
                     val buffer = ByteArray(minBufferSize/2)
+                    val shortBuffer = ShortArray(minBufferSize/4)
+                    
+                    // Initialize real-time voice processor
+                    val voiceProcessor = RealtimeVoiceProcessor(AudioConstants.SAMPLE_RATE)
+                    val effectsEnabled = VoiceEffectManager.isEnabled()
+                    val currentEffect = if (effectsEnabled) VoiceEffectManager.getCurrentEffect() else null
 
                     FileOutputStream(outputFile).use { rawAudioOut ->
                         while (isRecording.get()) {
@@ -91,6 +99,26 @@ class Pcm16AudioRecorder(
                                 // AudioRecord doesn't have a native pause and resume function,
                                 // so if paused, we just ignore the read bytes.
                                 continue
+                            }
+
+                            // Apply real-time voice effects if enabled
+                            if (effectsEnabled && currentEffect != null) {
+                                // Convert bytes to shorts for processing
+                                val shortCount = read / 2
+                                for (i in 0 until shortCount) {
+                                    val byteIndex = i * 2
+                                    shortBuffer[i] = ((buffer[byteIndex + 1].toInt() shl 8) or (buffer[byteIndex].toInt() and 0xFF)).toShort()
+                                }
+                                
+                                // Process audio with voice effect
+                                voiceProcessor.processBuffer(shortBuffer, shortCount, currentEffect)
+                                
+                                // Convert shorts back to bytes
+                                for (i in 0 until shortCount) {
+                                    val byteIndex = i * 2
+                                    buffer[byteIndex] = (shortBuffer[i].toInt() and 0xFF).toByte()
+                                    buffer[byteIndex + 1] = ((shortBuffer[i].toInt() shr 8) and 0xFF).toByte()
+                                }
                             }
 
                             // Write to original file
