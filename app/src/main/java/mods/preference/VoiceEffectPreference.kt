@@ -44,8 +44,8 @@ class VoiceEffectPreference(context: Context, attrs: AttributeSet) :
         val effectGroup = dialogView.findViewById<RadioGroup>(R.id.voice_effect_radio_group)
         
         // Set current state
-        enableSwitch.isChecked = VoiceEffectManager.isEnabled()
-        effectGroup.isEnabled = enableSwitch.isChecked
+        enableSwitch?.isChecked = VoiceEffectManager.isEnabled()
+        val isEnabled = enableSwitch?.isChecked ?: false
         
         // Create radio buttons for each effect
         val currentEffect = VoiceEffectManager.getCurrentEffect()
@@ -54,15 +54,17 @@ class VoiceEffectPreference(context: Context, attrs: AttributeSet) :
                 text = effect.displayName
                 id = effect.ordinal
                 isChecked = effect == currentEffect
-                isEnabled = enableSwitch.isChecked
+                this.isEnabled = isEnabled
             }
-            effectGroup.addView(radioButton)
+            effectGroup?.addView(radioButton)
         }
         
         // Handle switch toggle
-        enableSwitch.setOnCheckedChangeListener { _, isChecked ->
-            for (i in 0 until effectGroup.childCount) {
-                effectGroup.getChildAt(i).isEnabled = isChecked
+        enableSwitch?.setOnCheckedChangeListener { _, isChecked ->
+            effectGroup?.let { group ->
+                for (i in 0 until group.childCount) {
+                    group.getChildAt(i)?.isEnabled = isChecked
+                }
             }
         }
         
@@ -70,11 +72,11 @@ class VoiceEffectPreference(context: Context, attrs: AttributeSet) :
             .setTitle("Voice Effect Settings")
             .setView(dialogView)
             .setPositiveButton("Apply") { _, _ ->
-                val enabled = enableSwitch.isChecked
+                val enabled = enableSwitch?.isChecked ?: false
                 VoiceEffectManager.setEnabled(enabled)
                 
                 if (enabled) {
-                    val selectedId = effectGroup.checkedRadioButtonId
+                    val selectedId = effectGroup?.checkedRadioButtonId ?: -1
                     if (selectedId != -1) {
                         val selectedEffect = VoiceEffect.fromOrdinal(selectedId)
                         VoiceEffectManager.setCurrentEffect(selectedEffect)
