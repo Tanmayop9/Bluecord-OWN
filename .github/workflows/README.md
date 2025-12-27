@@ -133,12 +133,15 @@ Check the workflow logs:
 ## APK Details
 
 ### Debug APK Properties
+These values are configured in `app/build.gradle` and may change as the project evolves:
 - **Package Name**: `com.bluecord`
 - **Version Code**: 1
 - **Version Name**: 1.0
 - **Min SDK**: 21 (Android 5.0)
 - **Target SDK**: 30
 - **Compile SDK**: 34
+
+To verify current values, check the `app/build.gradle` file.
 
 ### APK Size
 - Expected size: ~12-15 MB (debug build)
