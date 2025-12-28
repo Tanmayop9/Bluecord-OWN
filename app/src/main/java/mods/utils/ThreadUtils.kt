@@ -119,8 +119,10 @@ object ThreadUtils {
     }
 
     @JvmStatic
-    fun startThread(name: String, runnable: Runnable) {
-        Thread(runnable, name).start()
+    fun startThread(name: String, runnable: Runnable): Thread {
+        val thread = Thread(runnable, name)
+        thread.start()
+        return thread
     }
 
     private class SafeRunnable(private val target: Runnable): Runnable {
